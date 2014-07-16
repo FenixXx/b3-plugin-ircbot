@@ -1,0 +1,69 @@
+<configuration plugin="ircbot">
+    <settings name="settings">
+        <!-- the name of the bot [try to specify a unique name not to have duplicates] [REQUIRED] -->
+        <set name="nickname"></set>
+        <!-- amount of minutes between cron specific method execution [default = 2]-->
+        <set name="interval">2</set>
+        <!-- specify if ban notices must be forwarded to the IRC network [default = yes] -->
+        <set name="showbans">yes</set>
+        <!-- specify if kick notices must be forwarded to the IRC network [default = yes] -->
+        <set name="showkicks">yes</set>
+        <!-- specify whether to show game info when a new game is starting on the server [default = yes] -->
+        <set name="showgame">yes</set>
+    </settings>
+    <settings name="connection">
+        <!-- the address of the IRC server the bot should connect to [REQUIRED] -->
+        <set name="address"></set>
+        <!-- the port to be used for the IRC server connection [default = 6667] [REQUIRED] -->
+        <set name="port">6667</set>
+        <!-- which IRC channel the bot should join [REQUIRED] -->
+        <set name="channel"></set>
+        <!-- amount of seconds between two consecutive commands [default = 1] -->
+        <set name="maxrate">1</set>
+    </settings>
+    <settings name="commands-irc">
+        <!--
+        IRC Groups: level : description
+        ===============================
+        2 : OPERATOR
+        1 : VOICED
+        0 : NORMAL
+        -->
+        <set name="alias">2</set>                   <!-- display all the aliases of a client -->
+        <set name="b3">0</set>                      <!-- display the B3 version -->
+        <set name="cvar">2</set>                    <!-- set/get a cvar value -->
+        <set name="help">0</set>                    <!-- display the help text -->
+        <set name="list">1</set>                    <!-- display the list of online clients -->
+        <set name="livechat">2</set>                <!-- enable or disable the live chat -->
+        <set name="lookup">2</set>                  <!-- retrieve information on a client -->
+        <set name="plugins">2</set>                 <!-- display a list of plugins loaded -->
+        <set name="reconnect">2</set>               <!-- reconnect to the IRC network -->
+        <set name="showbans">2</set>                <!-- enable/disable the ban notifications -->
+        <set name="showkicks">2</set>               <!-- enable/disable the kick notifications -->
+        <set name="showgame">2</set>                <!-- enable/disable new game notifications -->
+        <set name="status">2</set>                  <!-- display server status information -->
+    </settings>
+    <settings name="commands">
+        <!--
+        Groups are (keyword / level : description)
+        ==============================================
+        superadmin / 100 : Super admin (server owner)
+        senioradmin / 80 : Senior admins
+        fulladmin / 60   : Full admins
+        admin / 40       : Admins
+        mod / 20         : Moderators
+        reg / 2          : Regular players (VIP)
+        user / 1         : Registered players (those who typed !register)
+        guest / 0        : Unregistered players
+        -->
+        <set name="livechat">80</set>               <!-- enable or disable the live chat globally -->
+        <set name="showbans">80</set>               <!-- enable/disable the ban notification globally -->
+        <set name="showkicks">80</set>              <!-- enable/disable the kick notification globally -->
+        <set name="showgame">80</set>               <!-- enable/disable notification about new games -->
+    </settings>
+    <perform>
+        <!-- place here a list commands the BOT should execute upon connection -->
+        <!-- <command></command> -->
+        <!-- <command></command> -->
+    </perform>
+</configuration>
