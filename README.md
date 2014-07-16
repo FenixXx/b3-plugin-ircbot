@@ -66,9 +66,9 @@ B3 events
 
 The plugin make use of the folowing events to display notices in the IRC channel:
 
-* `EVT_CLIENT_BAN` and `EVT_CLIENT_BAN_TEMP` : send a notice in the channel when an admin ban a client (if enabled)
-* `EVT_CLIENT_KICK` : send a notice in the channel when an admin kick a client (if enabled)
-* `EVT_GAME_MAP_CHANGE` : send a notice in the channel when a new game start
+* `EVT_CLIENT_BAN` and `EVT_CLIENT_BAN_TEMP` : send a notice upon admin bans
+* `EVT_CLIENT_KICK` : send a notice upon admin kicks
+* `EVT_GAME_MAP_CHANGE` : send a notice when a new game start
 
 Support
 -------
