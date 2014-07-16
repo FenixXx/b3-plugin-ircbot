@@ -116,7 +116,6 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         Dispatch events to on_<event.type> method, if available.
         """
         # if there is a handler defined for this type of event, execute it
-        self.verbose('received event: E<%s> - T<%s> - A<%s>' % (event.type, str(event.target), str(event.arguments)))
         if hasattr(self, 'on_%s' % event.type):
             try:
                 self.verbose('handling event: Event<%s>' % event.type)
