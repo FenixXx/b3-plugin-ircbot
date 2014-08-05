@@ -279,7 +279,7 @@ class IrcbotPlugin(b3.plugin.Plugin):
         duration = 'permanent'
         if 'duration' in event.data:
             # if there is a duration convert it
-            duration = minutesStr(duration)
+            duration = minutesStr(event.data['duration'])
 
         # append the duration to the ban notice
         message += ' [duration : %s%s%s]' % (RED, duration, RESET)
