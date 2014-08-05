@@ -20,9 +20,11 @@
 #
 # 17/07/2014 - 1.0 - Fenix
 # * initial release
+# 05/08/2014 - 1.1 - Pr3acher
+# * fixed duration for tempban
 
 __author__ = 'Fenix'
-__version__ = '1.0'
+__version__ = '1.1'
 
 import b3
 import b3.plugin
@@ -279,7 +281,7 @@ class IrcbotPlugin(b3.plugin.Plugin):
         duration = 'permanent'
         if 'duration' in event.data:
             # if there is a duration convert it
-            duration = minutesStr(duration)
+            duration = minutesStr(event.data['duration'])
 
         # append the duration to the ban notice
         message += ' [duration : %s%s%s]' % (RED, duration, RESET)
