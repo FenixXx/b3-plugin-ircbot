@@ -268,9 +268,9 @@ class IrcbotPlugin(b3.plugin.Plugin):
             # server with TK plugin enabled) and the bot could
             # be G-Lined.
             return
-        
-        reason = event.data['reason']
+
         client = event.client
+        reason = event.data['reason']
 
         message = '[%sBAN%s] %s%s%s banned %s%s%s' % (RED, RESET, ORANGE, admin.name, RESET, ORANGE, client.name, RESET)
 
@@ -304,8 +304,8 @@ class IrcbotPlugin(b3.plugin.Plugin):
             # be G-Lined.
             return
 
-        reason = event.data['reason']
         client = event.client
+        reason = event.data['reason']
 
         message = '[%sKICK%s] %s%s%s kicked %s%s%s' % (RED, RESET, ORANGE, admin.name, RESET, ORANGE, client.name, RESET)
 
@@ -321,12 +321,17 @@ class IrcbotPlugin(b3.plugin.Plugin):
     def onMapChange(self, event):
         """
         Perform operations on EVT_GAME_MAP_CHANGE
-        :param event: An EVT_GAME_MAP_CHANGE EVENT
+        :param event: An EVT_GAME_MAP_CHANGE event.
         """
-        mapname = event.data['new']
+        if not len(self.console.clients.getList()):
+            # do not display information if the server is empty: no one
+            # will join an empty server anyway so don't bother
+            return
+
         num = len(self.console.clients.getList())
         maxnum = self.console.getCvar('sv_maxclients').getInt()
         address = self.serverinfo['ip'] + ':' + self.serverinfo['port']
+        mapname = event.data['new']
 
         for name, channel in self.ircbot.channels.iteritems():
             if channel.showgame:
