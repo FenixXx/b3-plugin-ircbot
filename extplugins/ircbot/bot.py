@@ -28,11 +28,13 @@ import sys
 import socket
 import traceback
 
+from b3.clients import Client
 from b3.clients import Group
 from b3.functions import minutesStr
 from b3.functions import getCmd
 from textwrap import TextWrapper
 from time import sleep
+from time import time
 
 from irc.client import Event
 from irc.client import InvalidCharacters
@@ -553,6 +555,40 @@ class IRCBot(irc.bot.SingleServerIRCBot):
 
         # send the list of online clients
         cmd.sayLoudOrPM(client, 'online clients: %s' % ', '.join(collection))
+
+    def cmd_listbans(self, client, data, cmd=None):
+        """
+        <client> - list all the active bans of a client
+        """
+        if not data:
+            client.message('missing data, try %s!%shelp listbans' % (ORANGE, RESET))
+            return
+
+        bclient = self.lookup_client(data, client)
+        if not bclient:
+            return
+
+        # get all the bans and tempbans of this client
+        penalties = self.plugin.console.storage.getClientPenalties(bclient, type='Ban') + \
+                    self.plugin.console.storage.getClientPenalties(bclient, type='TempBan')
+
+        if not penalties:
+            cmd.sayLoudOrPM(client, '%s%s%s has no active bans' % (ORANGE, bclient.name, RESET))
+            return
+
+        for p in penalties:
+            banstring = 'ban: %s@%s%s' % (ORANGE, p.id, RESET)
+            if p.adminId:
+                admin = self.plugin.console.storage.getClient(Client(id=p.adminId))
+                banstring += ' - issued by: %s%s%s' % (ORANGE, admin.name, RESET)
+            if p.reason:
+                banstring += ' - reason: %s%s%s' % (ORANGE, self.plugin.console.stripColors(p.reason), RESET)
+            if p.timeExpire != -1:
+                banstring += ' - expire: %s%s%s' % (RED, minutesStr(((p.timeExpire - time()) / 60)), RESET)
+            else:
+                banstring += ' - expire: %snever%s' % (RED, RESET)
+
+            cmd.sayLoudOrPM(client, banstring)
 
     def cmd_livechat(self, client, data, cmd=None):
         """
