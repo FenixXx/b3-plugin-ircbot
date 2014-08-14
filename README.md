@@ -44,6 +44,7 @@ if a command typed in the chat is directed to him or not: when this match fails 
 * **!cvar &lt;botname&gt; &lt;name&gt; [&lt;value&gt;]** `set/get a cvar value`
 * **!help &lt;botname&gt; [&lt;command&gt;]** `display the help text`
 * **!list &lt;botname&gt;** `display the list of online clients`
+* **!listbans &lt;client&gt;** `list all the active bans of a given client`
 * **!livechat &lt;botname&gt; [&lt;on|off&gt;]** `enable/disable the livechat`
 * **!lookup &lt;botname&gt; &lt;client&gt;** `retrieve information on a client`
 * **!plugins &lt;botname&gt;** `display a list of plugins loaded`

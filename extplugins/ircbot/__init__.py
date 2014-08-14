@@ -18,13 +18,14 @@
 #
 # CHANGELOG
 #
-# 17/07/2014 - 1.0 - Fenix
-# * initial release
-# 05/08/2014 - 1.1 - Pr3acher
-# * fixed duration for tempban
+# 17/07/2014 - 1.0 - Fenix    - initial release
+# 05/08/2014 - 1.1 - Pr3acher - fixed duration for tempban
+# 14/08/2014 - 1.2 - Fenix    - do not display game information if the server is empty
+#                             - added command !listbans: display the active bans of a given client
+#                             - inform clients when a received command is not registered
 
 __author__ = 'Fenix'
-__version__ = '1.1'
+__version__ = '1.2'
 
 import b3
 import b3.plugin
