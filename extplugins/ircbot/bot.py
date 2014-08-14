@@ -422,9 +422,8 @@ class IRCBot(irc.bot.SingleServerIRCBot):
 
             command = command.lower()
             if not command in self.commands:
-                # there may be different bots in the same IRC channels so probably
-                # this command belongs to one of them: do not warn for invalid command
-                self.debug('received command %s which is not registered: not warning for invalid command...' % command)
+                # actually inform the client that the command is not a valid one
+                client.message('invalid command: %s%s%s%s' % (ORANGE, self.cmdPrefix, RED, command))
                 return
 
             # get the command object
@@ -672,7 +671,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         sleep(2)                                    # sleep a bit so the network has time to free our nickname
 
         # reconnect to the same network
-        self.debug('connectiing to IRC network %s:%s' % (self.settings['address'], self.settings['port']))
+        self.debug('connecting to IRC network %s:%s' % (self.settings['address'], self.settings['port']))
         self.connection.reconnect()
         self.install_crontab()                      # reinstall the crontab
 
