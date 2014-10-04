@@ -54,6 +54,7 @@ from ircbot.command import LEVEL_USER
 from ircbot.command import LEVEL_OPERATOR
 from ircbot.functions import convert_colors
 
+
 class IRCBot(irc.bot.SingleServerIRCBot):
 
     plugin = None
@@ -393,6 +394,17 @@ class IRCBot(irc.bot.SingleServerIRCBot):
             return pfx, cmd[0], ''
         return pfx, cmd[0], cmd[1]
 
+    @staticmethod
+    def get_reason(reason):
+        """
+        Append a suffix to the given reason which identifies penalties issued from IRC
+        :param reason: The reason for the penalty
+        :return: A formatted reason with a suffix appended
+        """
+        if not reason:
+            return 'banned by an IRC admin'
+        return reason + ' (by an IRC admin)'
+
     def ban(self, bclient, client, reason=None, keyword=None, duration=None):
         """
         Ban a client from the server.
@@ -412,9 +424,10 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         # make him a guest again
         bclient.groupBits = 0
         bclient.save()
+
         # get the correct ban method and use it
         ban = bclient.ban if not duration else bclient.tempban
-        ban(reason=reason, keyword=keyword, duration=duration)
+        ban(reason=self.get_reason(reason), keyword=keyword, duration=duration)
 
         banmessage = '%s%s%s was banned by %s%s%s' % (ORANGE, bclient.name, RESET, ORANGE, client.nick, RESET)
         if duration:
@@ -620,7 +633,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
 
         # get the reason and kick the client
         reason = self.plugin.adminPlugin.getReason(keyword)
-        bclient.kick(reason=reason, keyword=keyword)
+        bclient.kick(reason=self.get_reason(reason), keyword=keyword)
 
         # compute the feedback message
         message = '%s%s%s was kicked by %s%s%s' % (ORANGE, bclient.name, RESET, ORANGE, client.nick, RESET)
@@ -905,7 +918,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
             return
 
         reason = self.plugin.adminPlugin.getReason(keyword)
-        bclient.unban(reason=reason)
+        bclient.unban(reason=self.get_reason(reason))
 
         message = '%s%s%s was un-banned by %s%s%s' % (ORANGE, bclient.name, RESET, ORANGE, client.nick, RESET)
         if reason:
