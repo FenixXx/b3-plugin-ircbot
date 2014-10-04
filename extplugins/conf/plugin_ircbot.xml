@@ -46,6 +46,7 @@
         <set name="showgame">2</set>                <!-- enable/disable new game notifications -->
         <set name="status">2</set>                  <!-- display server status information -->
         <set name="tempban">2</set>                 <!-- tempban a client from the server -->
+        <set name="unban">2</set>                   <!-- unban a client from the server -->
     </settings>
     <settings name="commands">
         <!--

@@ -852,6 +852,31 @@ class IRCBot(irc.bot.SingleServerIRCBot):
 
         self.ban(bclient=bclient, client=client, reason=reason, keyword=keyword, duration=duration)
 
+    def cmd_unban(self, client, data, cmd=None):
+        """
+        <client> [<reason>] - unban a client from the server
+        """
+        m = self.plugin.adminPlugin.parseUserCmd(data)
+        if not m:
+            client.message('invalid data, try %s!%shelp unban' % (ORANGE, RESET))
+            return
+
+        cid, keyword = m
+        bclient = self.lookup_client(cid, client)
+        if not bclient:
+            return
+
+        reason = self.plugin.adminPlugin.getReason(keyword)
+        bclient.unban(reason=reason)
+
+        message = '%s%s%s was un-banned by %s%s%s' % (ORANGE, bclient.name, RESET, ORANGE, client.nick, RESET)
+        if reason:
+            # add the ban reason: convert game server color codes for proper printing
+            message += ' [reason: %s%s%s]' % (RED, convert_colors(reason), RESET)
+
+        # print globally
+        client.channel.message(message)
+
     ####################################################################################################################
     ##                                                                                                                ##
     ##   CUSTOM LOGGING METHODS                                                                                       ##
