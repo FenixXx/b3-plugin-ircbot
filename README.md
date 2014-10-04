@@ -40,19 +40,25 @@ specify as first parameter the BOT name. Every IRC BOT will try to match such pa
 if a command typed in the chat is directed to him or not: when this match fails the BOT will simply ignore the command.
 
 * **!alias &lt;botname&gt; &lt;client&gt;** `display all the aliases of a client`
+* **!ban &lt;botname&gt; &lt;client&gt; [&lt;reason&gt;]** `ban a client`
 * **!b3 &lt;botname&gt;** `display the B3 version`
 * **!cvar &lt;botname&gt; &lt;name&gt; [&lt;value&gt;]** `set/get a cvar value`
 * **!help &lt;botname&gt; [&lt;command&gt;]** `display the help text`
+* **!kick &lt;botname&gt; &lt;client&gt; [&lt;reason&gt;]** `kick a client`
 * **!list &lt;botname&gt;** `display the list of online clients`
 * **!listbans &lt;client&gt;** `list all the active bans of a given client`
 * **!livechat &lt;botname&gt; [&lt;on|off&gt;]** `enable/disable the livechat`
 * **!lookup &lt;botname&gt; &lt;client&gt;** `retrieve information on a client`
+* **!permban &lt;botname&gt; &lt;client&gt; [&lt;reason&gt;]** `permban a client`
 * **!plugins &lt;botname&gt;** `display a list of plugins loaded`
 * **!reconnect &lt;botname&gt;** `reconnect to the IRC network`
 * **!showbans &lt;botname&gt; [&lt;on|off&gt;]** `enable/disable the ban notifications`
 * **!showkicks &lt;botname&gt; [&lt;on|off&gt;]** `enable/disable the kick notifications`
 * **!showgame &lt;botname&gt; [&lt;on|off&gt;]** `enable/disable new game notifications`
 * **!status &lt;botname&gt;** `display server status information`
+* **!tempban &lt;botname&gt; &lt;client&gt; &lt;duration&gt; [&lt;reason&gt;]** `tempban a client`
+* **!unban &lt;botname&gt; &lt;client&gt; [&lt;reason&gt;]** `un-ban a client`
+* **!version &lt;botname&gt;** `display the plugin version`
 
 B3 commands
 -----------
