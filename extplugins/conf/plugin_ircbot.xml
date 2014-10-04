@@ -48,6 +48,7 @@
         <set name="status">2</set>                  <!-- display server status information -->
         <set name="tempban">2</set>                 <!-- tempban a client from the server -->
         <set name="unban">2</set>                   <!-- unban a client from the server -->
+        <set name="version">0</set>                 <!-- display the plugin version -->
     </settings>
     <settings name="commands">
         <!--

@@ -47,6 +47,8 @@ from irc.client import _rfc_1459_command_regexp
 from irc.client import is_channel
 from irc.events import numeric
 
+from ircbot import __version__ as p_version
+from ircbot import __author__ as p_author
 from ircbot.colors import *
 from ircbot.channel import IRCChannel
 from ircbot.command import IRCCommand
@@ -927,6 +929,13 @@ class IRCBot(irc.bot.SingleServerIRCBot):
 
         # print globally
         client.channel.message(message)
+
+    def cmd_version(self, client, data, cmd=None):
+        """
+        - display the plugin version
+        """
+        cmd.sayLoudOrPM(client, 'IRC BOT plugin for BigBrotherBot(%sB3%s) by %s%s%s - version %s%s%s' % (
+                        GREEN, RESET, ORANGE, p_author, RESET, ORANGE, p_version, RESET))
 
     ####################################################################################################################
     ##                                                                                                                ##
