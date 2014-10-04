@@ -38,6 +38,7 @@
         <set name="listbans">2</set>                <!-- list all the active bans of a given client -->
         <set name="livechat">2</set>                <!-- enable or disable the live chat -->
         <set name="lookup">2</set>                  <!-- retrieve information on a client -->
+        <set name="permban">2</set>                 <!-- permban a client from the server -->
         <set name="plugins">2</set>                 <!-- display a list of plugins loaded -->
         <set name="reconnect">2</set>               <!-- reconnect to the IRC network -->
         <set name="showbans">2</set>                <!-- enable/disable the ban notifications -->

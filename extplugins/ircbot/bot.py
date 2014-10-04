@@ -688,6 +688,23 @@ class IRCBot(irc.bot.SingleServerIRCBot):
                         GREEN, bclient.ip, RESET, GREEN, bclient.guid, RESET, GREEN, bclient.connections, RESET, GREEN,
                         bclient.numWarnings, RESET, GREEN, bclient.numBans))
 
+    def cmd_permban(self, client, data, cmd=None):
+        """
+        <client> [reason] - permanently ban a client from the server
+        """
+        m = self.plugin.adminPlugin.parseUserCmd(data)
+        if not m:
+            client.message('invalid data, try %s!%shelp ban' % (ORANGE, RESET))
+            return
+
+        cid, keyword = m
+        bclient = self.lookup_client(cid, client)
+        if not bclient:
+            return
+
+        reason = self.plugin.adminPlugin.getReason(keyword)
+        self.ban(bclient=bclient, client=client, reason=reason, keyword=keyword)
+
     def cmd_plugins(self, client, data, cmd=None):
         """
         - display the list of plugins loaded
