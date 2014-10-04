@@ -809,6 +809,32 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         cmd.sayLoudOrPM(client, 'mapname: %s%s%s - players: %s%s%s/%s - nextmap: %s%s' % (GREEN,
                                  mapname, RESET, GREEN, num, RESET, maxnum, GREEN, nextmap))
 
+    def cmd_tempban(self, client, data, cmd=None):
+        """
+        <client> <duration> [reason] - tempban a client from the server
+        """
+        m = self.plugin.adminPlugin.parseUserCmd(data)
+        if not m:
+            client.message('invalid data, try %s!%shelp tempban' % (ORANGE, RESET))
+            return
+
+        # lookup the client
+        bclient = self.lookup_client(m[0], client)
+        if not bclient:
+            return
+
+        # validate input data
+        m = re.match('^([0-9]+[dwhsm]*)(?:\s(.+))?$', m[1], re.IGNORECASE)
+        if not m:
+            client.message('invalid data, try %s!%shelp tempban' % (ORANGE, RESET))
+            return
+
+        duration, keyword = m.groups()
+        duration = time2minutes(duration)
+        reason = self.plugin.adminPlugin.getReason(keyword)
+
+        self.ban(bclient=bclient, client=client, reason=reason, keyword=keyword, duration=duration)
+
     ####################################################################################################################
     ##                                                                                                                ##
     ##   CUSTOM LOGGING METHODS                                                                                       ##
