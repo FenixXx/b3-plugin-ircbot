@@ -31,6 +31,7 @@
         -->
         <set name="alias">2</set>                   <!-- display all the aliases of a client -->
         <set name="b3">0</set>                      <!-- display the B3 version -->
+        <set name="ban">2</set>                     <!-- ban a client from the server -->
         <set name="cvar">2</set>                    <!-- set/get a cvar value -->
         <set name="help">0</set>                    <!-- display the help text -->
         <set name="list">1</set>                    <!-- display the list of online clients -->

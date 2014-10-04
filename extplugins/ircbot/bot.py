@@ -30,6 +30,7 @@ import traceback
 
 from b3.clients import Client
 from b3.clients import Group
+from b3.functions import time2minutes
 from b3.functions import minutesStr
 from b3.functions import getCmd
 from textwrap import TextWrapper
@@ -392,6 +393,41 @@ class IRCBot(irc.bot.SingleServerIRCBot):
             return pfx, cmd[0], ''
         return pfx, cmd[0], cmd[1]
 
+    def ban(self, bclient, client, reason=None, keyword=None, duration=None):
+        """
+        Ban a client from the server.
+        :param bclient: The B3 client to ban
+        :param client: The IRCClient executing the ban
+        :param reason: The reason for this ban
+        :param keyword: The keyword used for the ban reason
+        :param duration: The duration of the ban
+        """
+        # protect superadmins from being banned
+        bgroup = Group(keyword='superadmin')
+        bgroup = self.plugin.console.storage.getGroup(bgroup)
+        if bclient.inGroup(bgroup):
+            client.message("%s%s%s is a %s%s%s and can't be banned" % (ORANGE, bclient.name, RESET, ORANGE, bgroup.name, RESET))
+            return
+
+        # make him a guest again
+        bclient.groupBits = 0
+        bclient.save()
+        # get the correct ban method and use it
+        ban = bclient.ban if not duration else bclient.tempban
+        ban(reason=reason, keyword=keyword, duration=duration)
+
+        banmessage = '%s%s%s was banned by %s%s%s' % (ORANGE, bclient.name, RESET, ORANGE, client.nick, RESET)
+        if duration:
+            # add the duration in a readable format if specified
+            banmessage += ' for %s%s%s' % (RED, minutesStr(time2minutes(duration)), RESET)
+        if reason:
+            # add the ban reason: convert game server color codes for proper printing
+            banmessage += ' [reason: %s%s%s]' % (RED, convert_colors(reason), RESET)
+
+        # since the ban produced an event without admin client object, there
+        # will be no notice displayed in the IRC channel, so print the message publicly
+        client.channel.message(banmessage)
+
     ####################################################################################################################
     ##                                                                                                                ##
     ##   COMMAND EXECUTION                                                                                            ##
@@ -474,6 +510,24 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         cmd.sayLoudOrPM(client, '%s - uptime: [%s%s%s]' % (convert_colors(b3.version),
                                                            minutesStr(self.plugin.console.upTime() / 60.0),
                                                            GREEN, RESET))
+
+    def cmd_ban(self, client, data, cmd=None):
+        """
+        <client> [reason] - ban a client from the server
+        """
+        m = self.plugin.adminPlugin.parseUserCmd(data)
+        if not m:
+            client.message('invalid data, try %s!%shelp ban' % (ORANGE, RESET))
+            return
+
+        cid, keyword = m
+        bclient = self.lookup_client(cid, client)
+        if not bclient:
+            return
+
+        reason = self.plugin.adminPlugin.getReason(keyword)
+        duration = self.plugin.adminPlugin.config.getDuration('settings', 'ban_duration')
+        self.ban(bclient=bclient, client=client, reason=reason, keyword=keyword, duration=duration)
 
     def cmd_cvar(self, client, data, cmd=None):
         """
