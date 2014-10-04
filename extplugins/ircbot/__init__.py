@@ -23,9 +23,15 @@
 # 14/08/2014 - 1.2 - Fenix    - do not display game information if the server is empty
 #                             - added command !listbans: display the active bans of a given client
 #                             - inform clients when a received command is not registered
+# 04/10/2014 - 1.3 - Fenix    - added !ban command: ban a player from the server
+#                             - added !tempban command: temporarly ban a player from the server
+#                             - added !permban command: permanently ban a player from the server
+#                             - added !unban command: unban a player from the server
+#                             - added !kick command: kick a player from the server
+#                             - added !version command: display the plugin version
 
 __author__ = 'Fenix'
-__version__ = '1.2'
+__version__ = '1.3'
 
 import b3
 import b3.plugin
