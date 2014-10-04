@@ -34,6 +34,7 @@
         <set name="ban">2</set>                     <!-- ban a client from the server -->
         <set name="cvar">2</set>                    <!-- set/get a cvar value -->
         <set name="help">0</set>                    <!-- display the help text -->
+        <set name="kick">2</set>                    <!-- kick a client from the server -->
         <set name="list">1</set>                    <!-- display the list of online clients -->
         <set name="listbans">2</set>                <!-- list all the active bans of a given client -->
         <set name="livechat">2</set>                <!-- enable or disable the live chat -->

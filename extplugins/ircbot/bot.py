@@ -593,6 +593,44 @@ class IRCBot(irc.bot.SingleServerIRCBot):
                                                  self.commands[command].name,
                                                  self.commands[command].help))
 
+    def cmd_kick(self, client, data, cmd=None):
+        """
+        <client> [<reason>] - kick a client from the server
+        """
+        m = self.plugin.adminPlugin.parseUserCmd(data)
+        if not m:
+            client.message('invalid data, try %s!%shelp kick' % (ORANGE, RESET))
+            return
+
+        cid, keyword = m
+        bclient = self.lookup_client(cid, client)
+        if not bclient:
+            return
+
+        if not bclient.cid:
+            client.message('%s%s%s is not connected' % (ORANGE, bclient.name, RESET))
+            return
+
+        # protect superadmins from being kicked
+        bgroup = Group(keyword='superadmin')
+        bgroup = self.plugin.console.storage.getGroup(bgroup)
+        if bclient.inGroup(bgroup):
+            client.message("%s%s%s is a %s%s%s and can't be kicked" % (ORANGE, bclient.name, RESET, ORANGE, bgroup.name, RESET))
+            return
+
+        # get the reason and kick the client
+        reason = self.plugin.adminPlugin.getReason(keyword)
+        bclient.kick(reason=reason, keyword=keyword)
+
+        # compute the feedback message
+        message = '%s%s%s was kicked by %s%s%s' % (ORANGE, bclient.name, RESET, ORANGE, client.nick, RESET)
+        if reason:
+            # add the ban reason: convert game server color codes for proper printing
+            message += ' [reason: %s%s%s]' % (RED, convert_colors(reason), RESET)
+
+        # print globally
+        client.channel.message(message)
+
     def cmd_list(self, client, data, cmd=None):
         """
         - display the list of online clients
