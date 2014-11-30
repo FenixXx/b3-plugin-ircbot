@@ -10,7 +10,7 @@ implements both IRC and in-game commands and it react on both B3 and IRC events.
 Download
 --------
 
-Latest version available [here](https://github.com/FenixXx/b3-plugin-ircbot/archive/master.zip).
+Latest version available [here](https://github.com/danielepantaleone/b3-plugin-ircbot/archive/master.zip).
 
 Requirements
 ------------
