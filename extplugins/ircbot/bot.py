@@ -56,6 +56,7 @@ from ircbot.command import LEVEL_USER
 from ircbot.command import LEVEL_OPERATOR
 from ircbot.functions import convert_colors
 
+P_ALL = 'all'
 
 class IRCBot(irc.bot.SingleServerIRCBot):
 
@@ -480,10 +481,17 @@ class IRCBot(irc.bot.SingleServerIRCBot):
             # since multiple B3 can be connected to the same channel we have to identify
             # on which B3 the command we parsed needs to be forwarded. To do so we expect
             # to see the BOT name as first argument of the command.
+            # 08/12/2014: added 'listen_global' configuration variable which let bots to interact
+            # with commands forwarded using the 'all' placeholder as bot name (all the bots will intercept the command)
             split = data.split(' ', 1)
-            botname = self.connection.get_nickname()
-            if split[0].lower() != botname.lower():
-                return
+            botname = self.connection.get_nickname().lower()
+            placeholder = split[0].lower()
+            if self.settings['listen_global']:
+                if placeholder != botname and placeholder != P_ALL:
+                    return
+            else:
+                if placeholder != botname:
+                    return
 
             data = ''
             if len(split) > 1:

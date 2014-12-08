@@ -18,20 +18,22 @@
 #
 # CHANGELOG
 #
-# 17/07/2014 - 1.0 - Fenix    - initial release
-# 05/08/2014 - 1.1 - Pr3acher - fixed duration for tempban
-# 14/08/2014 - 1.2 - Fenix    - do not display game information if the server is empty
-#                             - added command !listbans: display the active bans of a given client
-#                             - inform clients when a received command is not registered
-# 04/10/2014 - 1.3 - Fenix    - added !ban command: ban a player from the server
-#                             - added !tempban command: temporarly ban a player from the server
-#                             - added !permban command: permanently ban a player from the server
-#                             - added !unban command: unban a player from the server
-#                             - added !kick command: kick a player from the server
-#                             - added !version command: display the plugin version
-# 08/12/2014 - 1.4 - Fenix    - automcatically rejoin channels upon kick event
-#                             - minor change to lib patching method: requires separate ctcp module introduced
-#                               on 20th Nov 2014
+# 17/07/2014 - 1.0   - Fenix    - initial release
+# 05/08/2014 - 1.1   - Pr3acher - fixed duration for tempban
+# 14/08/2014 - 1.2   - Fenix    - do not display game information if the server is empty
+#                               - added command !listbans: display the active bans of a given client
+#                               - inform clients when a received command is not registered
+# 04/10/2014 - 1.3   - Fenix    - added !ban command: ban a player from the server
+#                               - added !tempban command: temporarly ban a player from the server
+#                               - added !permban command: permanently ban a player from the server
+#                               - added !unban command: unban a player from the server
+#                               - added !kick command: kick a player from the server
+#                               - added !version command: display the plugin version
+# 08/12/2014 - 1.4   - Fenix    - automcatically rejoin channels upon kick event
+#                               - minor change to lib patching method: requires separate ctcp module introduced
+#                                 on 20th Nov 2014
+# 08/12/2014 - 1.4.1 - Fenix    - allow the bot to listen to commands forwarded globally using the 'all' placeholder
+#                                 so that multiple bots can intercept the very same command and process it
 
 __author__ = 'Fenix'
 __version__ = '1.4'
@@ -65,6 +67,7 @@ class IrcbotPlugin(b3.plugin.Plugin):
     settings = {
         'nickname': '',
         'interval': 1,
+        'listen_global': True,
         'showbans': True,
         'showkicks': True,
         'showgame': True,
@@ -111,6 +114,15 @@ class IrcbotPlugin(b3.plugin.Plugin):
         except ValueError, e:
             self.warning('could not load settings/interval config value: %s' % e)
             self.debug('using default value for settings/interval: %s' % self.settings['interval'])
+
+        try:
+            self.settings['listen_global'] = self.config.getboolean('settings', 'listen_global')
+            self.debug('loaded settings/listen_global: %s' % self.settings['listen_global'])
+        except NoOptionError:
+            self.error('could not find settings/listen_global in config file, using default: %s' % self.settings['listen_global'])
+        except ValueError, e:
+            self.warning('could not load settings/listen_global config value: %s' % e)
+            self.debug('using default value for settings/listen_global: %s' % self.settings['listen_global'])
 
         try:
             self.settings['showbans'] = self.config.getboolean('settings', 'showbans')

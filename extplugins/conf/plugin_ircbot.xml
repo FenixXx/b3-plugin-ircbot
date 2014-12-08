@@ -4,6 +4,8 @@
         <set name="nickname"></set>
         <!-- amount of minutes between cron specific method execution [default = 2]-->
         <set name="interval">2</set>
+        <!-- when set to 'yes' the BOT will intercept commands forwarded using the 'all' placeholder [default = yes]-->
+        <set name="listen_global">yes</set>
         <!-- specify if ban notices must be forwarded to the IRC network [default = yes] -->
         <set name="showbans">yes</set>
         <!-- specify if kick notices must be forwarded to the IRC network [default = yes] -->
