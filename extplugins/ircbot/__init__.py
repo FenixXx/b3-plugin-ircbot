@@ -29,9 +29,12 @@
 #                             - added !unban command: unban a player from the server
 #                             - added !kick command: kick a player from the server
 #                             - added !version command: display the plugin version
+# 08/12/2014 - 1.4 - Fenix    - automcatically rejoin channels upon kick event
+#                             - minor change to lib patching method: requires separate ctcp module introduced
+#                               on 20th Nov 2014
 
 __author__ = 'Fenix'
-__version__ = '1.3'
+__version__ = '1.4'
 
 import b3
 import b3.plugin
