@@ -42,10 +42,10 @@ from irc.client import InvalidCharacters
 from irc.client import MessageTooLong
 from irc.client import ServerNotConnectedError
 from irc.client import NickMask
-from irc.client import _ctcp_dequote
 from irc.client import _rfc_1459_command_regexp
 from irc.client import is_channel
 from irc.events import numeric
+from irc.ctcp import dequote
 
 from ircbot import __version__ as p_version
 from ircbot import __author__ as p_author
@@ -1081,7 +1081,7 @@ def _process_line(self, line):
     if command in ["privmsg", "notice"]:
 
         target, message = arguments[0], arguments[1]
-        messages = _ctcp_dequote(message)
+        messages = dequote(message)
 
         if command == "privmsg":
             if is_channel(target):
