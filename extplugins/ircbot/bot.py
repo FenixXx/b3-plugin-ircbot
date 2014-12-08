@@ -155,6 +155,23 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         # add the user to the channel user list
         self.channels[channel].add_user(nick=nick)
 
+    def _on_kick(self, connection, event):
+        """
+        Triggered when a user is kicked from a channel.
+        :param connection: The current server connection object instance.
+        :param event: The event to be handled.
+        """
+        nick = event.arguments[0]
+        channel = event.target
+        # if it's the bot itself being kicked from a channel
+        if nick == connection.get_nickname():
+            # delete che channel entry and let the bot rejoin:
+            # a new channel entry will be created due to _on_join being called
+            del self.channels[channel]
+            self.connection.join(self.settings['channel'])
+        else:
+            self.channels[channel].remove_user(nick)
+
     def _on_namreply(self, connection, event):
         """
         Triggered after the BOT joins a channel.
