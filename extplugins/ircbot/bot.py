@@ -168,6 +168,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
             # delete che channel entry and let the bot rejoin:
             # a new channel entry will be created due to _on_join being called
             del self.channels[channel]
+            self.debug('rejoining %s channel upon event kick being received...' % self.settings['channel'])
             self.connection.join(self.settings['channel'])
         else:
             self.channels[channel].remove_user(nick)
