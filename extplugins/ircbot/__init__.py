@@ -34,9 +34,10 @@
 #                                 on 20th Nov 2014
 # 08/12/2014 - 1.4.1 - Fenix    - allow the bot to listen to commands forwarded globally using the 'all' placeholder
 #                                 so that multiple bots can intercept the very same command and process it
+# 29/01/2015 - 1.5   - Fenix    - make use of the default onStop and onExit event handlers
 
 __author__ = 'Fenix'
-__version__ = '1.4'
+__version__ = '1.5'
 
 import b3
 import b3.plugin
@@ -229,10 +230,6 @@ class IrcbotPlugin(b3.plugin.Plugin):
         self.serverinfo['ip'] = self.console.config.get('server', 'public_ip')
         self.serverinfo['port'] = self.console.config.get('server', 'port')
 
-        # register process stop event hooks
-        self.registerEventHook(self.console.getEventID('EVT_STOP'), self.onShutdown)
-        self.registerEventHook(self.console.getEventID('EVT_EXIT'), self.onShutdown)
-
         # register necessary events
         self.registerEvent(self.console.getEventID('EVT_CLIENT_SAY'), self.onSay)
         self.registerEvent(self.console.getEventID('EVT_CLIENT_BAN'), self.onBan)
@@ -257,13 +254,20 @@ class IrcbotPlugin(b3.plugin.Plugin):
     ##                                                                                                                ##
     ####################################################################################################################
 
-    def onShutdown(self, event):
+    def onStop(self, event):
         """
-        Perform operations when B3 goes offline.
-        :param event: An EVT_STOP or EVT_EXIT event.
+        Perform operations when EVT_STOP is received
+        :param event: An EVT_STOP event
         """
         self.debug('shutting down irc connection...')
         self.ircbot.disconnect('B3 is going offline')
+
+    def onExit(self, event):
+        """
+        Perform operations when EVT_EXIT is received
+        :param event: An EVT_EXIT event
+        """
+        self.onStop(event)
 
     def onSay(self, event):
         """
