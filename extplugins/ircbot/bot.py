@@ -54,7 +54,6 @@ from ircbot.channel import IRCChannel
 from ircbot.command import IRCCommand
 from ircbot.command import LEVEL_USER
 from ircbot.command import LEVEL_OPERATOR
-from ircbot.functions import convert_colors
 
 P_ALL = 'all'
 

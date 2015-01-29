@@ -58,6 +58,15 @@ colormap = {
 }
 
 
+def convert_colors(message):
+    """
+    Convert Q3 color codes with IRC ones.
+    :param message: The string on which to operate.
+    """
+    for i in range(0, 10):
+        # loop form 0 to 9 and replace all the codes
+        message = message.replace('^%d' % i, colormap[i])
+    return '%s%s%s' % (RESET, message, RESET)
 
 
 
