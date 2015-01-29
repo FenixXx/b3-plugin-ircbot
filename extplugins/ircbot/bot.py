@@ -33,6 +33,7 @@ from b3.clients import Group
 from b3.functions import time2minutes
 from b3.functions import minutesStr
 from b3.functions import getCmd
+from copy import copy
 from textwrap import TextWrapper
 from time import sleep
 from time import time
@@ -60,6 +61,7 @@ P_ALL = 'all'
 class IRCBot(irc.bot.SingleServerIRCBot):
 
     plugin = None
+    adminPlugin = None
     settings = None
     wrapper = None
     cmdPrefix = '!'
@@ -81,6 +83,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         """
         self.plugin = plugin
         self.settings = plugin.settings
+        self.adminPlugin = plugin.adminPlugin
         self.cmdPrefix = plugin.adminPlugin.cmdPrefix
         self.cmdPrefixLoud = plugin.adminPlugin.cmdPrefixLoud
 
@@ -293,7 +296,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
 
         if len(message) > 2 and message[:1] in (self.cmdPrefix, self.cmdPrefixLoud):
             prefix, command, data = self.parse_command(message)
-            loud = prefix == self.plugin.adminPlugin.cmdPrefixLoud
+            loud = prefix == self.cmdPrefixLoud
             self.on_command(client=client, command=command, data=data, loud=loud)
         else:
             if channel.livechat:
@@ -555,7 +558,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         """
         <client> [reason] - ban a client from the server
         """
-        m = self.plugin.adminPlugin.parseUserCmd(data)
+        m = self.adminPlugin.parseUserCmd(data)
         if not m:
             client.message('invalid data, try %s!%shelp ban' % (ORANGE, RESET))
             return
@@ -565,8 +568,8 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         if not bclient:
             return
 
-        reason = self.plugin.adminPlugin.getReason(keyword)
-        duration = self.plugin.adminPlugin.config.getDuration('settings', 'ban_duration')
+        reason = self.adminPlugin.getReason(keyword)
+        duration = self.adminPlugin.config.getDuration('settings', 'ban_duration')
         self.ban(bclient=bclient, client=client, reason=reason, keyword=keyword, duration=duration)
 
     def cmd_cvar(self, client, data, cmd=None):
@@ -600,6 +603,69 @@ class IRCBot(irc.bot.SingleServerIRCBot):
             # to handle the case where the parser has no getCvar
             # or setCvar method implemented
             cmd.sayLoudOrPM('%s%s%s parser does not support cvar get/set' % (RED, self.plugin.console.game.gameName, RESET))
+
+    def cmd_exec(self, client, data, cmd=None):
+        """
+        <command> [<params>] - execute a b3 command (this command may have security
+        implications since an IRC operator will be recognized by B3 as a superadmin)
+        """
+        if not data:
+            client.message('missing data, try %s!%shelp cvar' % (ORANGE, RESET))
+            return
+
+        # append the prefix to the given data so we can use parse_command
+        if data[:1] not in (self.adminPlugin.cmdPrefix, self.adminPlugin.cmdPrefixLoud, self.adminPlugin.cmdPrefixBig):
+            data = '%s%s' % (self.adminPlugin.cmdPrefix, data)
+
+        prefix, command, args = self.parse_command(data.lower())
+        if command not in self.adminPlugin._commands:
+            client.message('invalid b3 command supplied: %s%s%s%s' % (ORANGE, self.adminPlugin.cmdPrefix, RESET, command))
+            return
+
+        ## MOCK SOME METHODS AND ATTRIBUTES
+        original_say = self.plugin.console.say
+        original_saybig = self.plugin.console.saybig
+        original_message = self.plugin.console.message
+
+        def new_say(text):
+            cmd.sayLoudOrPM(client, convert_colors(text))
+            original_say(text)
+
+        def new_saybig(text):
+            cmd.sayLoudOrPM(client, convert_colors(text))
+            original_saybig(text)
+
+        def new_message(target, text):
+            client.message(convert_colors(text))
+
+        self.plugin.console.say = new_say
+        self.plugin.console.saybig = new_saybig
+        self.plugin.console.message = new_message
+        new_cmd = copy(cmd)
+        new_cmd.sayLoudOrPM_original = new_cmd.sayLoudOrPM
+        new_cmd.sayLoudOrPM = lambda x, y: new_cmd.sayLoudOrPM_original(x, self.plugin.console.stripColors(y))
+
+        setattr(client, 'name', client.nick)
+        setattr(client, 'exactName', client.nick)
+        setattr(client, 'maxLevel', 100)
+        setattr(client, 'groupBits', 128)
+
+        try:
+            b3_command = self.adminPlugin._commands[command]
+            b3_command.func(data=args, client=client, cmd=new_cmd)
+            b3_command.time = self.plugin.console.time()
+        except Exception, e:
+            client.message('could not execute b3 command: %s%s%s%s' % (ORANGE, self.adminPlugin.cmdPrefix, RESET, command))
+            self.debug('could not execute B3 command : %s%s : %r' % (self.adminPlugin.cmdPrefix, command, e))
+        finally:
+            ## UNDO MOCKING
+            self.plugin.console.say = original_say
+            self.plugin.console.saybig = original_saybig
+            self.plugin.console.message = original_message
+            delattr(client, 'name')
+            delattr(client, 'exactName')
+            delattr(client, 'maxLevel')
+            delattr(client, 'groupBits')
 
     def cmd_help(self, client, data, cmd=None):
         """
@@ -637,7 +703,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         """
         <client> [<reason>] - kick a client from the server
         """
-        m = self.plugin.adminPlugin.parseUserCmd(data)
+        m = self.adminPlugin.parseUserCmd(data)
         if not m:
             client.message('invalid data, try %s!%shelp kick' % (ORANGE, RESET))
             return
@@ -659,7 +725,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
             return
 
         # get the reason and kick the client
-        reason = self.plugin.adminPlugin.getReason(keyword)
+        reason = self.adminPlugin.getReason(keyword)
         bclient.kick(reason=self.get_reason(reason), keyword=keyword)
 
         # compute the feedback message
@@ -770,7 +836,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         """
         <client> [reason] - permanently ban a client from the server
         """
-        m = self.plugin.adminPlugin.parseUserCmd(data)
+        m = self.adminPlugin.parseUserCmd(data)
         if not m:
             client.message('invalid data, try %s!%shelp ban' % (ORANGE, RESET))
             return
@@ -780,7 +846,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         if not bclient:
             return
 
-        reason = self.plugin.adminPlugin.getReason(keyword)
+        reason = self.adminPlugin.getReason(keyword)
         self.ban(bclient=bclient, client=client, reason=reason, keyword=keyword)
 
     def cmd_plugins(self, client, data, cmd=None):
@@ -908,7 +974,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         """
         <client> <duration> [reason] - tempban a client from the server
         """
-        m = self.plugin.adminPlugin.parseUserCmd(data)
+        m = self.adminPlugin.parseUserCmd(data)
         if not m:
             client.message('invalid data, try %s!%shelp tempban' % (ORANGE, RESET))
             return
@@ -926,7 +992,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
 
         duration, keyword = m.groups()
         duration = time2minutes(duration)
-        reason = self.plugin.adminPlugin.getReason(keyword)
+        reason = self.adminPlugin.getReason(keyword)
 
         self.ban(bclient=bclient, client=client, reason=reason, keyword=keyword, duration=duration)
 
@@ -934,7 +1000,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         """
         <client> [<reason>] - unban a client from the server
         """
-        m = self.plugin.adminPlugin.parseUserCmd(data)
+        m = self.adminPlugin.parseUserCmd(data)
         if not m:
             client.message('invalid data, try %s!%shelp unban' % (ORANGE, RESET))
             return
@@ -944,7 +1010,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         if not bclient:
             return
 
-        reason = self.plugin.adminPlugin.getReason(keyword)
+        reason = self.adminPlugin.getReason(keyword)
         bclient.unban(reason=self.get_reason(reason))
 
         message = '%s%s%s was un-banned by %s%s%s' % (ORANGE, bclient.name, RESET, ORANGE, client.nick, RESET)
