@@ -35,6 +35,7 @@
 # 08/12/2014 - 1.4.1 - Fenix    - allow the bot to listen to commands forwarded globally using the 'all' placeholder
 #                                 so that multiple bots can intercept the very same command and process it
 # 29/01/2015 - 1.5   - Fenix    - make use of the default onStop and onExit event handlers
+#                               - do not raise SystemExit when admin plugin cannot be retrieved
 
 __author__ = 'Fenix'
 __version__ = '1.5'
@@ -94,8 +95,7 @@ class IrcbotPlugin(b3.plugin.Plugin):
         b3.plugin.Plugin.__init__(self, console, config)
         self.adminPlugin = self.console.getPlugin('admin')
         if not self.adminPlugin:
-            self.critical('could not start without admin plugin')
-            raise SystemExit(220)
+            raise AttributeError('could not start without admin plugin')
 
     def onLoadConfig(self):
         """
