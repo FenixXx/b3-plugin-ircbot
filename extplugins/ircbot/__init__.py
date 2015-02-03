@@ -37,9 +37,10 @@
 # 29/01/2015 - 1.5   - Fenix    - make use of the default onStop and onExit event handlers
 #                               - do not raise SystemExit when admin plugin cannot be retrieved
 #                               - added !exec command: execute a B3 command from IRC
+# 03/02/2015 - 1.5.1 - Fenix    - changed wrapper length to 400 characters
 
 __author__ = 'Fenix'
-__version__ = '1.5'
+__version__ = '1.5.1'
 
 import b3
 import b3.plugin

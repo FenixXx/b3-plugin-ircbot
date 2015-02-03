@@ -22,6 +22,7 @@ import irc
 import irc.bot
 import irc.buffer
 import irc.client
+import irc.connection
 import irc.modes
 import re
 import sys
@@ -92,12 +93,11 @@ class IRCBot(irc.bot.SingleServerIRCBot):
 
         # initialize the textwrapper: will be used to split client/channel messages which will result in
         # messages set to the IRC network bigger than 512 bytes (which will raise MessageTooLong exception)
-        self.wrapper = TextWrapper(width=460, drop_whitespace=True, break_long_words=True, break_on_hyphens=False)
+        self.wrapper = TextWrapper(width=400, drop_whitespace=True, break_long_words=True, break_on_hyphens=False)
 
-        self.debug('connecting to IRC network %s:%s...' % (self.settings['address'], self.settings['port']))
-        irc.bot.SingleServerIRCBot.__init__(self, [(self.settings['address'], self.settings['port'])],
-                                            self.settings['nickname'],
-                                            self.settings['nickname'])
+        self.debug('connecting to network %s:%s...' % (self.settings['address'], self.settings['port']))
+        super(IRCBot, self).__init__(server_list=[(self.settings['address'], self.settings['port'])],
+                                     nickname=self.settings['nickname'], realname=self.settings['nickname'])
 
         if self.settings['maxrate'] > 0:
             # limit commands frequency as specified in the config file
@@ -154,6 +154,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
             self.channels[event.target] = IRCChannel(ircbot=self, name=channel)
             self.channels[event.target].showbans = self.settings['showbans']
             self.channels[event.target].showgame = self.settings['showgame']
+            self.channels[event.target].showkicks = self.settings['showkicks']
 
         # add the user to the channel user list
         self.channels[channel].add_user(nick=nick)
@@ -1038,43 +1039,43 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         """
         Log a CRITICAL message.
         """
-        self.plugin.critical('[IRC] %s' % msg, *args, **kwargs)
+        self.plugin.critical(msg, *args, **kwargs)
 
     def debug(self, msg, *args, **kwargs):
         """
         Log a DEBUG message.
         """
-        self.plugin.debug('[IRC] %s' % msg, *args, **kwargs)
+        self.plugin.debug(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
         """
         Log a ERROR message.
         """
-        self.plugin.error('[IRC] %s' % msg, *args, **kwargs)
+        self.plugin.error(msg, *args, **kwargs)
 
     def fatal(self, msg, *args, **kwargs):
         """
         Log a FATAL message.
         """
-        self.plugin.fatal('[IRC] %s' % msg, *args, **kwargs)
+        self.plugin.fatal(msg, *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
         """
         Log a INFO message.
         """
-        self.plugin.info('[IRC] %s' % msg, *args, **kwargs)
+        self.plugin.info(msg, *args, **kwargs)
 
     def warning(self, msg, *args, **kwargs):
         """
         Log a WARNING message.
         """
-        self.plugin.warning('[IRC] %s' % msg, *args, **kwargs)
+        self.plugin.warning(msg, *args, **kwargs)
 
     def verbose(self, msg, *args, **kwargs):
         """
         Log a VERBOSE message.
         """
-        self.plugin.verbose('[IRC] %s' % msg, *args, **kwargs)
+        self.plugin.verbose(msg, *args, **kwargs)
 
 ########################################################################################################################
 ##                                                                                                                    ##
