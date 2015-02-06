@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 from ircbot.colors import RESET
+from ircbot.colors import convert_colors
 
 class IRCClient(object):
     """
@@ -83,7 +84,7 @@ class IRCClient(object):
         """
         message = '%s%s' % (RESET, message)
         for msg in self.ircbot.wrapper.wrap(message):
-            self.connection.notice(self.nick, msg)
+            self.connection.notice(self.nick, convert_colors(msg))
 
     ####################################################################################################################
     ##                                                                                                                ##

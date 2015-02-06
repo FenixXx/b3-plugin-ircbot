@@ -616,6 +616,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
             client.message('missing data, try %s!%shelp cvar' % (ORANGE, RESET))
             return
 
+        data= data.strip()
         # append the prefix to the given data so we can use parse_command
         if data[:1] not in (self.adminPlugin.cmdPrefix, self.adminPlugin.cmdPrefixLoud, self.adminPlugin.cmdPrefixBig):
             data = '%s%s' % (self.adminPlugin.cmdPrefix, data)

@@ -40,6 +40,8 @@
 # 03/02/2015 - 1.5.1 - Fenix    - changed wrapper length to 400 characters
 # 06/02/2015 - 1.5.2 - Fenix    - added developer mode: inspect all IRC traffic
 #                               - added 2 seconds sleep time between autoperform commands
+#                               - fixed color code conversion in !exec commmand
+#                               - make sure to strip() parameters in !exec command
 
 __author__ = 'Fenix'
 __version__ = '1.5.2'
