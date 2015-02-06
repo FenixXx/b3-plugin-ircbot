@@ -42,6 +42,7 @@
 #                               - added 2 seconds sleep time between autoperform commands
 #                               - fixed color code conversion in !exec commmand
 #                               - make sure to strip() parameters in !exec command
+#                               - make sure to convert Q3 color codes in channel.message
 
 __author__ = 'Fenix'
 __version__ = '1.5.2'

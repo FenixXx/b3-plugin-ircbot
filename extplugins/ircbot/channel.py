@@ -20,6 +20,7 @@ from irc.bot import Channel
 
 from ircbot.colors import RESET
 from ircbot.client import IRCClient
+from ircbot.colors import convert_colors
 
 class IRCChannel(Channel):
     """
@@ -369,4 +370,4 @@ class IRCChannel(Channel):
         """
         message = '%s%s' % (RESET, message)
         for msg in self.ircbot.wrapper.wrap(message):
-            self.connection.privmsg(self.name, msg)
+            self.connection.privmsg(self.name, convert_colors(msg))
