@@ -89,7 +89,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         self.cmdPrefixLoud = plugin.adminPlugin.cmdPrefixLoud
 
         # patch the library
-        patch_lib(self.debug)
+        patch_lib(self)
 
         # initialize the textwrapper: will be used to split client/channel messages which will result in
         # messages set to the IRC network bigger than 512 bytes (which will raise MessageTooLong exception)
@@ -97,7 +97,8 @@ class IRCBot(irc.bot.SingleServerIRCBot):
 
         self.debug('connecting to network %s:%s...' % (self.settings['address'], self.settings['port']))
         super(IRCBot, self).__init__(server_list=[(self.settings['address'], self.settings['port'])],
-                                     nickname=self.settings['nickname'], realname=self.settings['nickname'])
+                                     nickname=self.settings['nickname'],
+                                     realname=self.settings['nickname'])
 
         if self.settings['maxrate'] > 0:
             # limit commands frequency as specified in the config file
@@ -270,6 +271,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         for command in self.settings['perform']:
             self.debug('sending auto perform command: %s' % command)
             self.connection.send_raw(command)
+            sleep(2) # sleep so the server can process the command
 
         # join the preconfingured channel
         self.debug('joining channel: %s...' % self.settings['channel'])
@@ -1124,6 +1126,10 @@ def _process_line(self, line):
     command = None
     arguments = None
 
+    # if developer mode is enabled this gets logged
+    if hasattr(self, 'dev') and callable(self.dev):
+        self.dev(line)
+
     m = _rfc_1459_command_regexp.match(line)
     if m.group("prefix"):
         prefix = m.group("prefix")
@@ -1198,22 +1204,33 @@ def _process_line(self, line):
         event = Event(command, source, target, arguments)
         self._handle_event(event)
 
-def patch_lib(log):
+
+def patch_lib(bot):
     """
     Patch the library applying changes to methods and attributes.
-    :param log: A logging method so we can notice changes in the log file.
+    :param bot: The IRCBot instance.
     """
-    # patch the send_raw method sow e can add more info when it raises exceptions
-    log('patching method: send_raw<%s> : send_raw<%s>' % (id(irc.client.ServerConnection.send_raw), id(send_raw)))
-    irc.client.ServerConnection.send_raw = send_raw
-
-    # patch the _process_line method so it doesn't generate 'all_raw_messages' events: speed up the bot
-    log('patching method: _process_line<%s> : _process_line<%s>' % (id(irc.client.ServerConnection._process_line), id(_process_line)))
-    irc.client.ServerConnection._process_line = _process_line
-
     # patch the buffer_class of ServerConnection so it doesn't raise UnicodeError when an input string can't
     # be decoded: LenientDecodingLineBuffer will use UTF8 but fallbacks on LATIN1 if the decode fails: for more
     # information on this matter visit https://bitbucket.org/jaraco/irc/issue/40/unicodedecodeerror
-    log('patching buffer_class: DecodingLineBuffer<%s> : LenientDecodingLineBuffer<%s>' % (
-        id(irc.client.ServerConnection.buffer_class.__class__), id(irc.buffer.LenientDecodingLineBuffer)))
+    bot.debug('patching buffer_class: DecodingLineBuffer<%s> : LenientDecodingLineBuffer<%s>' % (id(irc.client.ServerConnection.buffer_class.__class__), id(irc.buffer.LenientDecodingLineBuffer)))
     irc.client.ServerConnection.buffer_class = irc.buffer.LenientDecodingLineBuffer
+
+    # patch the send_raw method sow e can add more info when it raises exceptions
+    bot.debug('patching method: irc.client.ServerConnection.send_raw<%s> : send_raw<%s>' % (id(irc.client.ServerConnection.send_raw), id(send_raw)))
+    irc.client.ServerConnection.send_raw = send_raw
+
+    # patch the _process_line method so it doesn't generate 'all_raw_messages' events: speed up the bot
+    bot.debug('patching method: irc.client.ServerConnection._process_line<%s> : _process_line<%s>' % (id(irc.client.ServerConnection._process_line), id(_process_line)))
+    irc.client.ServerConnection._process_line = _process_line
+
+    if bot.settings['dev']:
+
+        def dev(self, msg, *args, **kwargs):
+            """
+            Log a DEV message.
+            """
+            bot.debug('[DEV] %s' % msg, *args, **kwargs)
+
+        bot.debug('creating method: irc.client.ServerConnection.dev<%s>' % id(dev))
+        irc.client.ServerConnection.dev = dev

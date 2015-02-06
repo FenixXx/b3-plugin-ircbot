@@ -38,9 +38,11 @@
 #                               - do not raise SystemExit when admin plugin cannot be retrieved
 #                               - added !exec command: execute a B3 command from IRC
 # 03/02/2015 - 1.5.1 - Fenix    - changed wrapper length to 400 characters
+# 06/02/2015 - 1.5.2 - Fenix    - added developer mode: inspect all IRC traffic
+#                               - added 2 seconds sleep time between autoperform commands
 
 __author__ = 'Fenix'
-__version__ = '1.5.1'
+__version__ = '1.5.2'
 
 import b3
 import b3.plugin
@@ -54,6 +56,7 @@ from ircbot.bot import IRCBot
 from ircbot.colors import *
 from threading import Thread
 from xml.dom import minidom
+
 
 class IrcbotPlugin(b3.plugin.Plugin):
     """
@@ -69,6 +72,7 @@ class IrcbotPlugin(b3.plugin.Plugin):
     }
 
     settings = {
+        'dev': False,
         'nickname': '',
         'interval': 1,
         'listen_global': True,
@@ -103,6 +107,14 @@ class IrcbotPlugin(b3.plugin.Plugin):
         """
         Load plugin configuration.
         """
+        if self.config.has_option('settings', 'dev'):
+            try:
+                self.settings['dev'] = self.config.getboolean('settings', 'dev')
+                self.debug('loaded settings/dev: %s' % self.settings['dev'])
+            except ValueError, e:
+                self.error('could not load settings/dev config value: %s' % e)
+                self.debug('using default value for settings/dev: %s' % self.settings['dev'])
+
         try:
             self.settings['nickname'] = self.config.get('settings', 'nickname')
             self.debug('loaded settings/nickname: %s' % self.settings['nickname'])
@@ -113,50 +125,50 @@ class IrcbotPlugin(b3.plugin.Plugin):
             self.settings['interval'] = self.config.getint('settings', 'interval')
             self.debug('loaded settings/interval: %s' % self.settings['interval'])
         except NoOptionError:
-            self.error('could not find settings/interval in config file, using default: %s' % self.settings['interval'])
+            self.warning('could not find settings/interval in config file, using default: %s' % self.settings['interval'])
         except ValueError, e:
-            self.warning('could not load settings/interval config value: %s' % e)
+            self.error('could not load settings/interval config value: %s' % e)
             self.debug('using default value for settings/interval: %s' % self.settings['interval'])
 
         try:
             self.settings['listen_global'] = self.config.getboolean('settings', 'listen_global')
             self.debug('loaded settings/listen_global: %s' % self.settings['listen_global'])
         except NoOptionError:
-            self.error('could not find settings/listen_global in config file, using default: %s' % self.settings['listen_global'])
+            self.warning('could not find settings/listen_global in config file, using default: %s' % self.settings['listen_global'])
         except ValueError, e:
-            self.warning('could not load settings/listen_global config value: %s' % e)
+            self.error('could not load settings/listen_global config value: %s' % e)
             self.debug('using default value for settings/listen_global: %s' % self.settings['listen_global'])
 
         try:
             self.settings['showbans'] = self.config.getboolean('settings', 'showbans')
             self.debug('loaded settings/showbans: %s' % self.settings['showbans'])
         except NoOptionError:
-            self.error('could not find settings/showbans in config file, using default: %s' % self.settings['showbans'])
+            self.warning('could not find settings/showbans in config file, using default: %s' % self.settings['showbans'])
         except ValueError, e:
-            self.warning('could not load settings/showbans config value: %s' % e)
+            self.error('could not load settings/showbans config value: %s' % e)
             self.debug('using default value for settings/showbans: %s' % self.settings['showbans'])
 
         try:
             self.settings['showkicks'] = self.config.getboolean('settings', 'showkicks')
             self.debug('loaded settings/showkicks: %s' % self.settings['showkicks'])
         except NoOptionError:
-            self.error('could not find settings/showkicks in config file, using default: %s' % self.settings['showkicks'])
+            self.warning('could not find settings/showkicks in config file, using default: %s' % self.settings['showkicks'])
         except ValueError, e:
-            self.warning('could not load settings/showkicks config value: %s' % e)
+            self.error('could not load settings/showkicks config value: %s' % e)
             self.debug('using default value for settings/showkicks: %s' % self.settings['showkicks'])
 
         try:
             self.settings['showgame'] = self.config.getboolean('settings', 'showgame')
             self.debug('loaded settings/showgame: %s' % self.settings['showgame'])
         except NoOptionError:
-            self.error('could not find settings/showgame in config file, using default: %s' % self.settings['showgame'])
+            self.warning('could not find settings/showgame in config file, using default: %s' % self.settings['showgame'])
         except ValueError, e:
-            self.warning('could not load settings/showgame config value: %s' % e)
+            self.error('could not load settings/showgame config value: %s' % e)
             self.debug('using default value for settings/showgame: %s' % self.settings['showgame'])
 
         try:
             self.settings['address'] = self.config.get('connection', 'address')
-            self.debug('loaded connection/address: %s' % self.settings['address'])
+            self.warning('loaded connection/address: %s' % self.settings['address'])
         except NoOptionError:
             self.error('could not find connection/address in config file: plugin will be disabled')
 
@@ -164,18 +176,19 @@ class IrcbotPlugin(b3.plugin.Plugin):
             self.settings['port'] = self.config.getint('connection', 'port')
             self.debug('loaded connection/port: %s' % self.settings['port'])
         except NoOptionError:
-            self.error('could not find connection/port in config file, using default: %s' % self.settings['port'])
+            self.warning('could not find connection/port in config file, using default: %s' % self.settings['port'])
         except ValueError, e:
-            self.warning('could not load connection/port config value: %s' % e)
+            # here we can try to use the default irc port value, altough it may not work
+            self.error('could not load connection/port config value: %s' % e)
             self.debug('using default value for connection/port: %s' % self.settings['port'])
 
         try:
             self.settings['maxrate'] = self.config.getint('connection', 'maxrate')
             self.debug('loaded connection/maxrate: %s' % self.settings['maxrate'])
         except NoOptionError:
-            self.error('could not find connection/maxrate in config file, using default: %s' % self.settings['maxrate'])
+            self.warning('could not find connection/maxrate in config file, using default: %s' % self.settings['maxrate'])
         except ValueError, e:
-            self.warning('could not load connection/maxrate config value: %s' % e)
+            self.error('could not load connection/maxrate config value: %s' % e)
             self.debug('using default value for connection/maxrate: %s' % self.settings['maxrate'])
 
         try:
@@ -183,8 +196,6 @@ class IrcbotPlugin(b3.plugin.Plugin):
             self.debug('loaded connection/channel: %s' % self.settings['channel'])
         except NoOptionError:
             self.error('could not find connection/channel in config file: plugin will be disabled')
-        except ValueError, e:
-            self.error('could not load connection/channel config value: plugin will be disabled: %s' % e)
 
         try:
             # automatic commands to be performed on connection
