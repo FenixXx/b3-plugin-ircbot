@@ -15,37 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-#
-# CHANGELOG
-#
-# 17/07/2014 - 1.0   - Fenix    - initial release
-# 05/08/2014 - 1.1   - Pr3acher - fixed duration for tempban
-# 14/08/2014 - 1.2   - Fenix    - do not display game information if the server is empty
-#                               - added command !listbans: display the active bans of a given client
-#                               - inform clients when a received command is not registered
-# 04/10/2014 - 1.3   - Fenix    - added !ban command: ban a player from the server
-#                               - added !tempban command: temporarly ban a player from the server
-#                               - added !permban command: permanently ban a player from the server
-#                               - added !unban command: unban a player from the server
-#                               - added !kick command: kick a player from the server
-#                               - added !version command: display the plugin version
-# 08/12/2014 - 1.4   - Fenix    - automcatically rejoin channels upon kick event
-#                               - minor change to lib patching method: requires separate ctcp module introduced
-#                                 on 20th Nov 2014
-# 08/12/2014 - 1.4.1 - Fenix    - allow the bot to listen to commands forwarded globally using the 'all' placeholder
-#                                 so that multiple bots can intercept the very same command and process it
-# 29/01/2015 - 1.5   - Fenix    - make use of the default onStop and onExit event handlers
-#                               - do not raise SystemExit when admin plugin cannot be retrieved
-#                               - added !exec command: execute a B3 command from IRC
-# 03/02/2015 - 1.5.1 - Fenix    - changed wrapper length to 400 characters
-# 06/02/2015 - 1.5.2 - Fenix    - added developer mode: inspect all IRC traffic
-#                               - added 2 seconds sleep time between autoperform commands
-#                               - fixed color code conversion in !exec commmand
-#                               - make sure to strip() parameters in !exec command
-#                               - make sure to convert Q3 color codes in channel.message
 
 __author__ = 'Fenix'
-__version__ = '1.5.2'
+__version__ = '1.6'
 
 import b3
 import b3.plugin
@@ -55,10 +27,11 @@ from b3.functions import getCmd
 from b3.functions import minutesStr
 from ConfigParser import NoOptionError
 from ConfigParser import NoSectionError
-from ircbot.bot import IRCBot
-from ircbot.colors import *
 from threading import Thread
 from xml.dom import minidom
+
+from .bot import IRCBot
+from .colors import *
 
 
 class IrcbotPlugin(b3.plugin.Plugin):
