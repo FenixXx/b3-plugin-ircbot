@@ -24,3 +24,5 @@
                               - make sure to strip() parameters in !exec command
                               - make sure to convert Q3 color codes in channel.message
 06/07/2015 - 1.6   - Fenix    - ship all the necessary libraries within the plugin
+14/07/2015 - 1.7   - Fenix    - fixed invalid logging message
+                              - make use of getSetting to load ocnfiguration file values (need B3 > 1.10.4)

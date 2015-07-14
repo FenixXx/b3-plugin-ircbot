@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 __author__ = 'Fenix'
-__version__ = '1.6'
+__version__ = '1.7'
 
 import b3
 import b3.plugin
@@ -25,7 +25,6 @@ import b3.events
 
 from b3.functions import getCmd
 from b3.functions import minutesStr
-from ConfigParser import NoOptionError
 from ConfigParser import NoSectionError
 from threading import Thread
 from xml.dom import minidom
@@ -84,94 +83,18 @@ class IrcbotPlugin(b3.plugin.Plugin):
         Load plugin configuration.
         """
         if self.config.has_option('settings', 'dev'):
-            try:
-                self.settings['dev'] = self.config.getboolean('settings', 'dev')
-                self.debug('loaded settings/dev: %s' % self.settings['dev'])
-            except ValueError, e:
-                self.error('could not load settings/dev config value: %s' % e)
-                self.debug('using default value for settings/dev: %s' % self.settings['dev'])
+            self.settings['dev'] = self.getSetting('settings', 'dev', b3.BOOL, self.settings['dev'])
 
-        try:
-            self.settings['nickname'] = self.config.get('settings', 'nickname')
-            self.debug('loaded settings/nickname: %s' % self.settings['nickname'])
-        except NoOptionError:
-            self.error('could not find settings/nickname in config file: plugin will be disabled')
-
-        try:
-            self.settings['interval'] = self.config.getint('settings', 'interval')
-            self.debug('loaded settings/interval: %s' % self.settings['interval'])
-        except NoOptionError:
-            self.warning('could not find settings/interval in config file, using default: %s' % self.settings['interval'])
-        except ValueError, e:
-            self.error('could not load settings/interval config value: %s' % e)
-            self.debug('using default value for settings/interval: %s' % self.settings['interval'])
-
-        try:
-            self.settings['listen_global'] = self.config.getboolean('settings', 'listen_global')
-            self.debug('loaded settings/listen_global: %s' % self.settings['listen_global'])
-        except NoOptionError:
-            self.warning('could not find settings/listen_global in config file, using default: %s' % self.settings['listen_global'])
-        except ValueError, e:
-            self.error('could not load settings/listen_global config value: %s' % e)
-            self.debug('using default value for settings/listen_global: %s' % self.settings['listen_global'])
-
-        try:
-            self.settings['showbans'] = self.config.getboolean('settings', 'showbans')
-            self.debug('loaded settings/showbans: %s' % self.settings['showbans'])
-        except NoOptionError:
-            self.warning('could not find settings/showbans in config file, using default: %s' % self.settings['showbans'])
-        except ValueError, e:
-            self.error('could not load settings/showbans config value: %s' % e)
-            self.debug('using default value for settings/showbans: %s' % self.settings['showbans'])
-
-        try:
-            self.settings['showkicks'] = self.config.getboolean('settings', 'showkicks')
-            self.debug('loaded settings/showkicks: %s' % self.settings['showkicks'])
-        except NoOptionError:
-            self.warning('could not find settings/showkicks in config file, using default: %s' % self.settings['showkicks'])
-        except ValueError, e:
-            self.error('could not load settings/showkicks config value: %s' % e)
-            self.debug('using default value for settings/showkicks: %s' % self.settings['showkicks'])
-
-        try:
-            self.settings['showgame'] = self.config.getboolean('settings', 'showgame')
-            self.debug('loaded settings/showgame: %s' % self.settings['showgame'])
-        except NoOptionError:
-            self.warning('could not find settings/showgame in config file, using default: %s' % self.settings['showgame'])
-        except ValueError, e:
-            self.error('could not load settings/showgame config value: %s' % e)
-            self.debug('using default value for settings/showgame: %s' % self.settings['showgame'])
-
-        try:
-            self.settings['address'] = self.config.get('connection', 'address')
-            self.warning('loaded connection/address: %s' % self.settings['address'])
-        except NoOptionError:
-            self.error('could not find connection/address in config file: plugin will be disabled')
-
-        try:
-            self.settings['port'] = self.config.getint('connection', 'port')
-            self.debug('loaded connection/port: %s' % self.settings['port'])
-        except NoOptionError:
-            self.warning('could not find connection/port in config file, using default: %s' % self.settings['port'])
-        except ValueError, e:
-            # here we can try to use the default irc port value, altough it may not work
-            self.error('could not load connection/port config value: %s' % e)
-            self.debug('using default value for connection/port: %s' % self.settings['port'])
-
-        try:
-            self.settings['maxrate'] = self.config.getint('connection', 'maxrate')
-            self.debug('loaded connection/maxrate: %s' % self.settings['maxrate'])
-        except NoOptionError:
-            self.warning('could not find connection/maxrate in config file, using default: %s' % self.settings['maxrate'])
-        except ValueError, e:
-            self.error('could not load connection/maxrate config value: %s' % e)
-            self.debug('using default value for connection/maxrate: %s' % self.settings['maxrate'])
-
-        try:
-            self.settings['channel'] = self.config.get('connection', 'channel')
-            self.debug('loaded connection/channel: %s' % self.settings['channel'])
-        except NoOptionError:
-            self.error('could not find connection/channel in config file: plugin will be disabled')
+        self.settings['nickname'] = self.getSetting('settings', 'nickname', b3.STR, self.settings['nickname'])
+        self.settings['interval'] = self.getSetting('settings', 'interval', b3.INT, self.settings['interval'])
+        self.settings['listen_global'] = self.getSetting('settings', 'listen_global', b3.BOOL, self.settings['listen_global'])
+        self.settings['showbans'] = self.getSetting('settings', 'showbans', b3.BOOL, self.settings['showbans'])
+        self.settings['showkicks'] = self.getSetting('settings', 'showkicks', b3.BOOL, self.settings['showkicks'])
+        self.settings['showgame'] = self.getSetting('settings', 'showgame', b3.BOOL, self.settings['showgame'])
+        self.settings['address'] = self.getSetting('connection', 'address', b3.STR)
+        self.settings['port'] = self.getSetting('connection', 'port', b3.INT, self.settings['port'])
+        self.settings['maxrate'] = self.getSetting('connection', 'maxrate', b3.INT, self.settings['maxrate'])
+        self.settings['channel'] = self.getSetting('settings', 'channel', b3.STR, self.settings['channel'])
 
         try:
             # automatic commands to be performed on connection
