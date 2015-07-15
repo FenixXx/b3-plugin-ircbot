@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from irc.bot import Channel
+from ircbot.irc.bot import Channel
 
 from ircbot.colors import RESET
 from ircbot.client import IRCClient

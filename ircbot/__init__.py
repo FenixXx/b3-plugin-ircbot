@@ -17,19 +17,18 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 __author__ = 'Fenix'
-__version__ = '1.7'
+__version__ = '1.8'
 
-import b3
-import b3.plugin
-import b3.events
-
-from b3.functions import getCmd
-from b3.functions import minutesStr
 from ConfigParser import NoSectionError
 from threading import Thread
 from xml.dom import minidom
 
-from .bot import IRCBot
+import b3
+import b3.plugin
+import b3.events
+from b3.functions import getCmd
+from b3.functions import minutesStr
+from ircbot.bot import IRCBot
 from .colors import *
 
 
@@ -94,7 +93,7 @@ class IrcbotPlugin(b3.plugin.Plugin):
         self.settings['address'] = self.getSetting('connection', 'address', b3.STR)
         self.settings['port'] = self.getSetting('connection', 'port', b3.INT, self.settings['port'])
         self.settings['maxrate'] = self.getSetting('connection', 'maxrate', b3.INT, self.settings['maxrate'])
-        self.settings['channel'] = self.getSetting('settings', 'channel', b3.STR, self.settings['channel'])
+        self.settings['channel'] = self.getSetting('connection', 'channel', b3.STR, self.settings['channel'])
 
         try:
             # automatic commands to be performed on connection

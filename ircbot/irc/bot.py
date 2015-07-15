@@ -11,7 +11,7 @@ from __future__ import absolute_import
 
 import sys
 
-from .modes import parse_channel_modes
+from ircbot.irc.modes import parse_channel_modes
 from .client import SimpleIRCClient, ServerConnectionError, is_channel, VERSION_STRING
 from .dict import IRCDict
 

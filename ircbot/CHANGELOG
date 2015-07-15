@@ -26,3 +26,4 @@
 06/07/2015 - 1.6   - Fenix    - ship all the necessary libraries within the plugin
 14/07/2015 - 1.7   - Fenix    - fixed invalid logging message
                               - make use of getSetting to load ocnfiguration file values (need B3 > 1.10.4)
+16/07/2015 - 1.8   - Fenix    - fixed invalid settings::channel loading: correct is connection::channel

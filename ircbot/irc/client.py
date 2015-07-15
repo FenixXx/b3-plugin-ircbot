@@ -64,6 +64,7 @@ import itertools
 import contextlib
 
 import six
+
 from .itertools import always_iterable
 from .functools import Throttler
 
@@ -79,7 +80,7 @@ from . import buffer
 from . import schedule
 from . import features
 from . import ctcp
-from . import message
+from ircbot.irc import message, buffer, features, events, schedule, ctcp, functools, connection
 
 log = logging.getLogger('output')
 

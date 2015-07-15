@@ -16,29 +16,28 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-import b3
-import b3.cron
-import irc
-import irc.bot
-import irc.buffer
-import irc.client
-import irc.connection
-import irc.modes
 import re
 import sys
 import socket
 import traceback
-
-from b3.clients import Client
-from b3.clients import Group
-from b3.functions import time2minutes
-from b3.functions import minutesStr
-from b3.functions import getCmd
 from copy import copy
 from textwrap import TextWrapper
 from time import sleep
 from time import time
 
+import b3
+import b3.cron
+import irc
+import ircbot.irc.bot
+import irc.buffer
+import irc.client
+import irc.connection
+import irc.modes
+from b3.clients import Client
+from b3.clients import Group
+from b3.functions import time2minutes
+from b3.functions import minutesStr
+from b3.functions import getCmd
 from irc.client import Event
 from irc.client import InvalidCharacters
 from irc.client import MessageTooLong
@@ -48,7 +47,6 @@ from irc.client import _rfc_1459_command_regexp
 from irc.client import is_channel
 from irc.events import numeric
 from irc.ctcp import dequote
-
 from ircbot import __version__ as p_version
 from ircbot import __author__ as p_author
 from ircbot.colors import *
@@ -59,7 +57,7 @@ from ircbot.command import LEVEL_OPERATOR
 
 P_ALL = 'all'
 
-class IRCBot(irc.bot.SingleServerIRCBot):
+class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
 
     plugin = None
     adminPlugin = None
@@ -216,7 +214,7 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         :param connection: The current server connection object instance
         :param event: The event to be handled
         """
-        modes = irc.modes.parse_channel_modes(' '.join(event.arguments))
+        modes = ircbot.irc.modes.parse_channel_modes(' '.join(event.arguments))
         channel = event.target
         if channel in self.channels:
             if len(event.arguments) == 2:
@@ -1214,16 +1212,18 @@ def patch_lib(bot):
     # patch the buffer_class of ServerConnection so it doesn't raise UnicodeError when an input string can't
     # be decoded: LenientDecodingLineBuffer will use UTF8 but fallbacks on LATIN1 if the decode fails: for more
     # information on this matter visit https://bitbucket.org/jaraco/irc/issue/40/unicodedecodeerror
-    bot.debug('patching buffer_class: DecodingLineBuffer<%s> : LenientDecodingLineBuffer<%s>' % (id(irc.client.ServerConnection.buffer_class.__class__), id(irc.buffer.LenientDecodingLineBuffer)))
-    irc.client.ServerConnection.buffer_class = irc.buffer.LenientDecodingLineBuffer
+    bot.debug('patching buffer_class: DecodingLineBuffer<%s> : LenientDecodingLineBuffer<%s>' % (id(ircbot.irc.client.ServerConnection.buffer_class.__class__), id(
+        ircbot.irc.buffer.LenientDecodingLineBuffer)))
+    ircbot.irc.client.ServerConnection.buffer_class = ircbot.irc.buffer.LenientDecodingLineBuffer
 
     # patch the send_raw method sow e can add more info when it raises exceptions
-    bot.debug('patching method: irc.client.ServerConnection.send_raw<%s> : send_raw<%s>' % (id(irc.client.ServerConnection.send_raw), id(send_raw)))
-    irc.client.ServerConnection.send_raw = send_raw
+    bot.debug('patching method: irc.client.ServerConnection.send_raw<%s> : send_raw<%s>' % (id(ircbot.irc.client.ServerConnection.send_raw), id(send_raw)))
+    ircbot.irc.client.ServerConnection.send_raw = send_raw
 
     # patch the _process_line method so it doesn't generate 'all_raw_messages' events: speed up the bot
-    bot.debug('patching method: irc.client.ServerConnection._process_line<%s> : _process_line<%s>' % (id(irc.client.ServerConnection._process_line), id(_process_line)))
-    irc.client.ServerConnection._process_line = _process_line
+    bot.debug('patching method: irc.client.ServerConnection._process_line<%s> : _process_line<%s>' % (id(
+        ircbot.irc.client.ServerConnection._process_line), id(_process_line)))
+    ircbot.irc.client.ServerConnection._process_line = _process_line
 
     if bot.settings['dev']:
 
@@ -1234,4 +1234,4 @@ def patch_lib(bot):
             bot.debug('[DEV] %s' % msg, *args, **kwargs)
 
         bot.debug('creating method: irc.client.ServerConnection.dev<%s>' % id(dev))
-        irc.client.ServerConnection.dev = dev
+        ircbot.irc.client.ServerConnection.dev = dev

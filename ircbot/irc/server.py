@@ -51,10 +51,9 @@ import re
 import six
 
 from six.moves import socketserver
-
 from .client import NickMask
 from . import events
-from . import buffer
+from ircbot.irc import buffer, events
 
 SRV_WELCOME = "Welcome to {__name__} v{irc.client.VERSION}.".format(**locals())
 
