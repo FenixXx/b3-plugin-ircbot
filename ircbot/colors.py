@@ -67,12 +67,3 @@ def convert_colors(message):
         # loop form 0 to 9 and replace all the codes
         message = message.replace('^%d' % i, colormap[i])
     return '%s%s%s' % (RESET, message, RESET)
-
-
-
-
-
-
-
-
-

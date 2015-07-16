@@ -16,23 +16,23 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+import b3
+import b3.cron
 import re
 import sys
 import socket
 import traceback
-from copy import copy
-from textwrap import TextWrapper
-from time import sleep
-from time import time
-
-import b3
-import b3.cron
 import irc
-import ircbot.irc.bot
+import irc.bot
 import irc.buffer
 import irc.client
 import irc.connection
 import irc.modes
+
+from copy import copy
+from textwrap import TextWrapper
+from time import sleep
+from time import time
 from b3.clients import Client
 from b3.clients import Group
 from b3.functions import time2minutes
@@ -57,7 +57,7 @@ from ircbot.command import LEVEL_OPERATOR
 
 P_ALL = 'all'
 
-class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
+class IRCBot(irc.bot.SingleServerIRCBot):
 
     plugin = None
     adminPlugin = None
@@ -70,9 +70,9 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
     crontab = None
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##   BOT INITIALIZATION                                                                                           ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #   BOT INITIALIZATION                                                                                             #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def __init__(self, plugin):
@@ -114,9 +114,9 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
         self.install_crontab()
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##   OVERRIDDEN METHODS                                                                                           ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #   OVERRIDDEN METHODS                                                                                             #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def _dispatcher(self, connection, event):
@@ -126,7 +126,7 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
         # if there is a handler defined for this type of event, execute it
         if hasattr(self, 'on_%s' % event.type):
             try:
-                self.verbose('handling event: Event<%s>' % event.type)
+                self.verbose('handling event: Event<%s>', event.type)
                 method = getattr(self, 'on_%s' % event.type)
                 method(connection, event)
             except Exception, msg:
@@ -134,9 +134,9 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
                            msg.__class__.__name__, msg, traceback.extract_tb(sys.exc_info()[2]))
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##   OVERRIDDEN IRCBOT EVENT HANDLERS                                                                             ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #   OVERRIDDEN IRCBOT EVENT HANDLERS                                                                               #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def _on_join(self, connection, event):
@@ -171,7 +171,7 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
             # delete che channel entry and let the bot rejoin:
             # a new channel entry will be created due to _on_join being called
             del self.channels[channel]
-            self.debug('rejoining %s channel upon event kick being received...' % self.settings['channel'])
+            self.debug('rejoining %s channel upon event kick being received...', self.settings['channel'])
             self.connection.join(self.settings['channel'])
         else:
             self.channels[channel].remove_user(nick)
@@ -214,7 +214,7 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
         :param connection: The current server connection object instance
         :param event: The event to be handled
         """
-        modes = ircbot.irc.modes.parse_channel_modes(' '.join(event.arguments))
+        modes = irc.modes.parse_channel_modes(' '.join(event.arguments))
         channel = event.target
         if channel in self.channels:
             if len(event.arguments) == 2:
@@ -254,7 +254,7 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
         """
         nick1 = connection.get_nickname()
         nick2 = nick1 + '_'
-        self.warning('nickname already in use (%s): renaming to %s...' % (nick1, nick2))
+        self.warning('nickname already in use (%s): renaming to %s...', nick1, nick2)
         self.connection.nick(nick2)
 
     def on_welcome(self, connection, event):
@@ -263,7 +263,7 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
         :param connection: The current server connection object instance.
         :param event: The event to be handled.
         """
-        self.debug('received welcome from server %s:%s' % (self.settings['address'], self.settings['port']))
+        self.debug('received welcome from server %s:%s', self.settings['address'], self.settings['port'])
 
         # send the auto perform commands
         for command in self.settings['perform']:
@@ -272,7 +272,7 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
             sleep(2) # sleep so the server can process the command
 
         # join the preconfingured channel
-        self.debug('joining channel: %s...' % self.settings['channel'])
+        self.debug('joining channel: %s...', self.settings['channel'])
         self.connection.join(self.settings['channel'])
 
     def on_pubmsg(self, connection, event):
@@ -288,8 +288,8 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
             # the user who send a pub message in a channel in the user dict. Look that the most of the
             # times the user would need to join again the channel to issue commands if he's voiced
             # or an operator of the channel since this will not update user flags
-            self.warning('could not retrieve client %s on channel %s' % (nickmask.nick, channel.name))
-            self.debug('creating new entry for client %s in channel %s' % (nickmask.nick, channel.name))
+            self.warning('could not retrieve client %s on channel %s', nickmask.nick, channel.name)
+            self.debug('creating new entry for client %s in channel %s', nickmask.nick, channel.name)
             channel.add_user(nick=nickmask.nick)
 
         client = channel.get_user(nickmask.nick)    # IRCClient object instance
@@ -303,7 +303,7 @@ class IRCBot(ircbot.irc.bot.SingleServerIRCBot):
             if channel.livechat:
                 botname = self.connection.get_nickname()
                 if client.nick not in ('Q', 'S', 'D', botname) and not 'warbot' in client.nick:
-                    self.verbose('broadcasting chat message on game server: %s: %s' % (client.nick, message))
+                    self.verbose('broadcasting chat message on game server: %s: %s', client.nick, message)
                     self.plugin.console.say('^7[^1IRC^7] %s: ^3%s' % (client.nick, message))
 
     ####################################################################################################################
@@ -1212,18 +1212,20 @@ def patch_lib(bot):
     # patch the buffer_class of ServerConnection so it doesn't raise UnicodeError when an input string can't
     # be decoded: LenientDecodingLineBuffer will use UTF8 but fallbacks on LATIN1 if the decode fails: for more
     # information on this matter visit https://bitbucket.org/jaraco/irc/issue/40/unicodedecodeerror
-    bot.debug('patching buffer_class: DecodingLineBuffer<%s> : LenientDecodingLineBuffer<%s>' % (id(ircbot.irc.client.ServerConnection.buffer_class.__class__), id(
-        ircbot.irc.buffer.LenientDecodingLineBuffer)))
-    ircbot.irc.client.ServerConnection.buffer_class = ircbot.irc.buffer.LenientDecodingLineBuffer
+    irc.client.ServerConnection.buffer_class = irc.buffer.LenientDecodingLineBuffer
+    bot.debug('patched buffer_class: DecodingLineBuffer<%s> : LenientDecodingLineBuffer<%s>',
+              id(irc.client.ServerConnection.buffer_class.__class__),
+              id(irc.buffer.LenientDecodingLineBuffer))
 
     # patch the send_raw method sow e can add more info when it raises exceptions
-    bot.debug('patching method: irc.client.ServerConnection.send_raw<%s> : send_raw<%s>' % (id(ircbot.irc.client.ServerConnection.send_raw), id(send_raw)))
-    ircbot.irc.client.ServerConnection.send_raw = send_raw
+    irc.client.ServerConnection.send_raw = send_raw
+    bot.debug('patched method: irc.client.ServerConnection.send_raw<%s> : send_raw<%s>',
+              id(irc.client.ServerConnection.send_raw), id(send_raw))
 
     # patch the _process_line method so it doesn't generate 'all_raw_messages' events: speed up the bot
-    bot.debug('patching method: irc.client.ServerConnection._process_line<%s> : _process_line<%s>' % (id(
-        ircbot.irc.client.ServerConnection._process_line), id(_process_line)))
-    ircbot.irc.client.ServerConnection._process_line = _process_line
+    irc.client.ServerConnection._process_line = _process_line
+    bot.debug('patched method: irc.client.ServerConnection._process_line<%s> : _process_line<%s>',
+              id(irc.client.ServerConnection._process_line), id(_process_line))
 
     if bot.settings['dev']:
 
@@ -1233,5 +1235,5 @@ def patch_lib(bot):
             """
             bot.debug('[DEV] %s' % msg, *args, **kwargs)
 
-        bot.debug('creating method: irc.client.ServerConnection.dev<%s>' % id(dev))
-        ircbot.irc.client.ServerConnection.dev = dev
+        irc.client.ServerConnection.dev = dev
+        bot.debug('created method: irc.client.ServerConnection.dev<%s>', id(dev))

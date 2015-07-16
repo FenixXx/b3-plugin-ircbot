@@ -19,16 +19,16 @@
 __author__ = 'Fenix'
 __version__ = '1.8'
 
-from ConfigParser import NoSectionError
-from threading import Thread
-from xml.dom import minidom
-
 import b3
 import b3.plugin
 import b3.events
+
 from b3.functions import getCmd
 from b3.functions import minutesStr
-from ircbot.bot import IRCBot
+from ConfigParser import NoSectionError
+from threading import Thread
+from xml.dom import minidom
+from .bot import IRCBot
 from .colors import *
 
 
@@ -61,9 +61,9 @@ class IrcbotPlugin(b3.plugin.Plugin):
     }
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##  PLUGIN INIT                                                                                                   ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #   PLUGIN INIT                                                                                                    #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def __init__(self, console, config=None):
@@ -160,9 +160,9 @@ class IrcbotPlugin(b3.plugin.Plugin):
         self.debug('plugin started')
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##  EVENTS                                                                                                        ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #   EVENTS                                                                                                         #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def onStop(self, event):
@@ -247,12 +247,10 @@ class IrcbotPlugin(b3.plugin.Plugin):
         message = '[%sKICK%s] %s%s%s kicked %s%s%s' % (RED, RESET, ORANGE, admin.name, RESET, ORANGE, client.name, RESET)
 
         if reason:
-            # if there is a reason attached to the ban, append it to the notice
             message += ' [reason : %s%s%s]' % (RED, self.console.stripColors(reason), RESET)
 
         for name, channel in self.ircbot.channels.iteritems():
             if channel.showkicks:
-                # if showkicks is enabled, broadcast the notice
                 channel.message(message)
 
     def onMapChange(self, event):
@@ -276,14 +274,14 @@ class IrcbotPlugin(b3.plugin.Plugin):
                                 RESET, GREEN, mapname, RESET, GREEN, num, RESET, maxnum, BLUE, address))
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##  COMMANDS                                                                                                      ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #   COMMANDS                                                                                                       #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def cmd_livechat(self, data, client, cmd=None):
         """
-        [<on|off>] - enable or disable the live chat globally
+        [<on|off>] - enable or disable the live chat globally.
         """
         if not data:
             # display the current status
@@ -314,7 +312,7 @@ class IrcbotPlugin(b3.plugin.Plugin):
 
     def cmd_showbans(self, data, client, cmd=None):
         """
-        [<on|off>] - enable/disable the ban notifications globally
+        [<on|off>] - enable/disable the ban notifications globally.
         """
         if not data:
             # display the current status
@@ -345,7 +343,7 @@ class IrcbotPlugin(b3.plugin.Plugin):
 
     def cmd_showkicks(self, data, client, cmd=None):
         """
-        [<on|off>] - enable/disable the ban notifications globally
+        [<on|off>] - enable/disable the ban notifications globally.
         """
         if not data:
             # display the current status
@@ -376,7 +374,7 @@ class IrcbotPlugin(b3.plugin.Plugin):
 
     def cmd_showgame(self, data, client, cmd=None):
         """
-        [<on|off>] - enable/disable the game notifications globally
+        [<on|off>] - enable/disable the game notifications globally.
         """
         if not data:
             # display the current status

@@ -16,8 +16,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from ircbot.colors import RESET
-from ircbot.colors import convert_colors
+from .colors import RESET
+from .colors import convert_colors
 
 class IRCClient(object):
     """
@@ -32,9 +32,9 @@ class IRCClient(object):
     nick = None         # the client nickname
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##  OBJECT INIT                                                                                                   ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #   OBJECT INIT                                                                                                    #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def __init__(self, ircbot, channel, nick):
@@ -51,9 +51,9 @@ class IRCClient(object):
         self.nick = nick
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##  OTHER METHODS                                                                                                 ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #   OTHER METHODS                                                                                                  #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def is_oper(self):
@@ -87,9 +87,9 @@ class IRCClient(object):
             self.connection.notice(self.nick, convert_colors(msg))
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##  OBJECT REPRESENTATION                                                                                         ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #   OBJECT REPRESENTATION                                                                                          #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def __repr__(self):

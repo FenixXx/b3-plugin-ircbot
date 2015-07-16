@@ -16,11 +16,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from ircbot.irc.bot import Channel
-
-from ircbot.colors import RESET
-from ircbot.client import IRCClient
-from ircbot.colors import convert_colors
+from irc.bot import Channel
+from .colors import RESET
+from .client import IRCClient
+from .colors import convert_colors
 
 class IRCChannel(Channel):
     """
@@ -65,9 +64,9 @@ class IRCChannel(Channel):
         }
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##  USER RELATED METHODS                                                                                          ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #  USER RELATED METHODS                                                                                            #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def users(self):
@@ -262,9 +261,9 @@ class IRCChannel(Channel):
             del d[client.nick]
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##   CHANNEL MODE METHODS                                                                                         ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #   CHANNEL MODE METHODS                                                                                           #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def set_mode(self, mode, *args, **kwargs):
@@ -358,9 +357,9 @@ class IRCChannel(Channel):
         pass
 
     ####################################################################################################################
-    ##                                                                                                                ##
-    ##  USER RELATED METHODS                                                                                          ##
-    ##                                                                                                                ##
+    #                                                                                                                  #
+    #  USER RELATED METHODS                                                                                            #
+    #                                                                                                                  #
     ####################################################################################################################
 
     def message(self, message):
