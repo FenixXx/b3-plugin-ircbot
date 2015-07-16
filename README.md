@@ -15,16 +15,12 @@ Latest version available [here](https://github.com/danielepantaleone/b3-plugin-i
 Requirements
 ------------
 
-In order for this plugin to work you need to have B3 *v1.10dev* installed (or greater). This plugin make use of some 
-additions added to this B3 version since the 13th July 2014: to make sure you have the correct B3 version, download 
-the last development snapshot from [here](https://github.com/BigBrotherBot/big-brother-bot/archive/release-1.10.zip). 
-I will not introduce backward compatibility with B3 *1.9.x* version since it would require too many changes in the plugin 
-code.
+In order for this plugin to work you need to have B3 *v1.10.4 beta* installed (or greater). I will not introduce 
+backward compatibility with B3 *1.9.x* version since it would require too many changes in the plugin code.
 
 Installation
 ------------
 
-* install python [irc](https://bitbucket.org/jaraco/irc/overview) library by following instructions
 * copy the `ircbot` folder into `b3/extplugins`
 * add to the `plugins` section of your `b3.xml` config file:
 
